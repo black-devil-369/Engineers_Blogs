@@ -16,10 +16,10 @@ const app = express();
 
 app.use(express.json()); // this line of code allow to send json formate of from server
 
-const port = process.env.PORT || 4879;
+const Port = process.env.PORT || 4879;
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${Port}`);
 });
 // Here api routing
 app.use("/api/user", userRoutes);
