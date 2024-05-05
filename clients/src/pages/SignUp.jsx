@@ -1,43 +1,39 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  signInStart,
-  signInSuccess,
-  signInFailure,
-} from "../redux/user/userSlice.js";
-import OAuth from "../components/OAuth.jsx";
-function SignIn() {
+import OAuth from "../components/OAuth";
+
+function SignUp() {
   const [formData, setFormData] = useState({});
-  const { loading, error: errorMessage } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
-      return dispatch(signInFailure("Please fill out all fields"));
+    if (!formData.username || !formData.email || !formData.password) {
+      return setErrorMessage("Please fill out all fields");
     }
     try {
-      dispatch(signInStart());
-      const res = await fetch("/api/auth/signin", {
+      setLoading(true);
+      setErrorMessage(null);
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (data.success === false) {
-        dispatch(signInFailure(data.message));
+        return setErrorMessage(data.message);
       }
+      setLoading(false);
       if (res.ok) {
-        dispatch(signInSuccess(data));
-        navigate("/");
+        navigate("/sign-in");
       }
     } catch (error) {
-      dispatch(signInFailure(error.message));
+      setErrorMessage(error.message);
     }
   };
   return (
@@ -51,14 +47,20 @@ function SignIn() {
             </span>
             Blog
           </Link>
-          <p className="text-sm mt-5">
-            Enter your valid Email and Password to Go in the Home Page of this
-            is Blog page for Engineer's
-          </p>
+          <p className="text-sm mt-5">This is Blog page for Engineer's</p>
         </div>
         {/*right */}
         <div className="flex-1">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <div>
+              <Label value="Your username" />
+              <TextInput
+                type="text"
+                placeholder="Username"
+                id="username"
+                onChange={handleChange}
+              />
+            </div>
             <div>
               <Label value="Email" />
               <TextInput
@@ -72,7 +74,7 @@ function SignIn() {
               <Label value="Password" />
               <TextInput
                 type="password"
-                placeholder="**********"
+                placeholder="Password"
                 id="password"
                 onChange={handleChange}
               />
@@ -88,15 +90,15 @@ function SignIn() {
                   <span className="pl-3">Loading...</span>
                 </>
               ) : (
-                "Sign In"
+                "Sign Up"
               )}
             </Button>
             <OAuth />
           </form>
           <div className="mt-3">
-            <span>Create New Account Here ? </span>
-            <Link to={"/sign-up"} className="text-blue-500">
-              Sing Up
+            <span>Have an account ? </span>
+            <Link to={"/sign-in"} className="text-blue-500">
+              Sing In
             </Link>
             <div>
               {errorMessage && (
@@ -112,4 +114,4 @@ function SignIn() {
   );
 }
 
-export default SignIn;
+export default SignUp;
