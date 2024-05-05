@@ -14,7 +14,7 @@ function Dashboard() {
     }
   }, [location.search]);
   return (
-    <div>
+    <div className="">
       <div className="">
         {/** Sidebar */}
         <DashSidebar />
